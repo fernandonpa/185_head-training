@@ -1,0 +1,13 @@
+{
+  "shape": [
+    75,
+    994
+  ],
+  "avg_ref_max_column_mean": 8.246085296074549e-13,
+  "numerical_rank": 74,
+  "max_rel_diff_vs_rows_of_185_forward": 0.0,
+  "electrode_to_scalp_vertex_mm": {
+    "median": 8.922979903371472,
+    "max": 16.718503091993806
+  }
+}

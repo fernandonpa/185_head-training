@@ -21,9 +21,14 @@ import time
 import zipfile
 from pathlib import Path
 
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import config_185 as C  # noqa: E402
+
 REPO = Path(__file__).resolve().parents[1]
 
-README = """# Results of the 185-electrode {label} run (SEREEGA data, trained on Kaggle)
+README = """# Results of the {n}-electrode {label} run (SEREEGA data, trained on Kaggle)
 
 | Folder / file | Content |
 |---------------|---------|
@@ -35,25 +40,25 @@ README = """# Results of the 185-electrode {label} run (SEREEGA data, trained on
 | `models/best_val_model.pt` | **weights with the lowest validation loss (used for the test; use this for validation on real data)** |
 | `models/last_model.pt`, `models/last.ckpt` | weights / full checkpoint of the final epoch (the only copies kept; overwritten after every epoch) |
 | `models/{team_file}` | the team's own save (checkpoint with the lowest training loss) |
-| `reference/` | leadfield (185 x 994), electrode list, source positions, region mapping and noise model used for this model |
+| `reference/` | leadfield ({n} x 994), electrode list, source positions, region mapping and noise model used for this model |
 | `main_train_output/` | the team's own output tree (TensorBoard logs, `trained_models/`) |
 
 ## Using the model for the real-data validation (local machine)
 
 Model: `{model_ctor}`,
 weights = `models/best_val_model.pt` (a Lightning-module `state_dict`).
-Input: `(batch, 185, 500)`, channel order = `reference/electrode_185.mat` (= `electrodes_185.csv` of the validation dataset), average-referenced,
+Input: `(batch, {n}, 500)`, channel order = `reference/{el_name}` ({channel_note}), average-referenced,
 500 samples at **1000 Hz**, scaled by max-abs; output `(batch, 994, 500)` source activity for the 994 regions.
 With the team's script (from `model_training/`):
 
-    python predict/{real_script} <name> -real_data_dir <validation data folder> -leadfield_mat <results>/reference/leadfield_185_20k.mat \\
+    python predict/{real_script} <name> -real_data_dir <validation data folder> -leadfield_mat <results>/reference/{lf_name} \\
         -train_run_dir <any existing folder> -weights_path <results>/models/best_val_model.pt -n_times 500
 """
 MODELS = {
     "vit": dict(label="ViT-ESI", team_file="VIT_model.pt", real_script="eval_real_vit.py",
-                model_ctor="models.vit.EEGViTpl(num_sensor=185, num_source=994, n_times=500, embed_dim=256, depth=6, num_heads=8, mlp_dim=512, dropout=0.1, optimizer=None, lr=1e-3, criterion=None)"),
+                model_ctor="models.vit.EEGViTpl(num_sensor={n}, num_source=994, n_times=500, embed_dim=256, depth=6, num_heads=8, mlp_dim=512, dropout=0.1, optimizer=None, lr=1e-3, criterion=None)"),
     "deepsif": dict(label="DeepSIF", team_file="DEEPSIF_model.pt", real_script="eval_real_deepsif.py",
-                    model_ctor="models.deepsif.DeepSIFpl(num_sensor=185, num_source=994, temporal_input_size=500, optimizer=None, lr=1e-3, criterion=None)"),
+                    model_ctor="models.deepsif.DeepSIFpl(num_sensor={n}, num_source=994, temporal_input_size=500, optimizer=None, lr=1e-3, criterion=None)"),
 }
 
 
@@ -84,10 +89,13 @@ def main():
     cand = sorted((res / "main_train_output").glob(f"**/trained_models/{cfg['team_file']}"))
     if cand:
         shutil.copy2(cand[-1], res / "models" / cfg["team_file"])
-    for name in ("leadfield_185_20k.mat", "electrode_185.mat", "sources_fsav_994.mat", "fs_cortex_20k_region_mapping.mat", "noise_model_185.mat"):
+    for name in C.REFERENCE_FILES:
         if (REPO / "anatomy" / name).exists():
             shutil.copy2(REPO / "anatomy" / name, res / "reference" / name)
-    (res / "README_RESULTS.md").write_text(README.format(**cfg))
+    fmt = dict(cfg, n=C.N_ELECTRODES, lf_name=C.LEADFIELD.name, el_name=C.ELECTRODES.name,
+               channel_note="= electrodes_185.csv of the validation dataset" if C.PIPELINE == "185" else "= the 75 electrodes selected from the 185, in the order of the original 75-electrode montage; see ccepcoreg_75sub/electrodes_75sub.csv")
+    fmt["model_ctor"] = cfg["model_ctor"].format(n=C.N_ELECTRODES)
+    (res / "README_RESULTS.md").write_text(README.format(**fmt))
 
     zpath = Path(a.zip)
     rows = ["path,size_bytes,sha256"]

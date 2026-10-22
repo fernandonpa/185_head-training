@@ -95,7 +95,7 @@ def prediction_figure(te: Path, fig: Path):
     for r in range(n):
         gt, pr, eeg = d["gt"][r].astype(float), d["pred"][r].astype(float), d["eeg"][r].astype(float)
         tg = int(np.abs(gt).max(axis=0).argmax()); tp = int(np.abs(pr).max(axis=0).argmax())
-        ax[r, 0].plot(eeg.T, lw=0.3); ax[r, 0].set_title(f"test sample {int(d['sample_id'][r])}: input EEG (185 ch)")
+        ax[r, 0].plot(eeg.T, lw=0.3); ax[r, 0].set_title(f"test sample {int(d['sample_id'][r])}: input EEG ({eeg.shape[0]} ch)")
         for c, (vec, ttl) in enumerate([(np.abs(gt[:, tg]), f"ground truth at {tg} samples"), (np.abs(pr[:, tp]), f"prediction at {tp} samples")]):
             vec = vec / (vec.max() + 1e-12)
             ax[r, 1 + 2 * c].scatter(pos[:, 1], pos[:, 0], c="lightgray", s=2); ax[r, 1 + 2 * c].scatter(pos[:, 1], pos[:, 0], c=vec, s=6 + 30 * vec, cmap="Reds", vmin=0, vmax=1)

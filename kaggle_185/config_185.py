@@ -6,15 +6,30 @@ count (185) and the leadfield file.  Nothing here modifies the team's scripts: t
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 
+# Pipeline profile: "185" (default) = the 185 released ccepcoreg electrodes; "75sub" = the 75 of them selected to match the original 75-electrode montage
+# (headmodel_75sub/).  Everything else (data generation, training, test) is identical; only the electrode set / leadfield differ.
+PIPELINE = os.environ.get("ESI_PIPELINE", "185")
+_PROFILES = {
+    "185": dict(leadfield="leadfield_185_20k.mat", electrodes="electrode_185.mat", eloc_key="eloc185", n=185, noise="noise_model_185.mat"),
+    "75sub": dict(leadfield="leadfield_75sub_20k.mat", electrodes="electrode_75sub.mat", eloc_key="eloc75sub", n=75, noise="noise_model_75sub.mat"),
+}
+if PIPELINE not in _PROFILES:
+    raise ValueError(f"ESI_PIPELINE must be one of {sorted(_PROFILES)}, got {PIPELINE!r}")
+_P = _PROFILES[PIPELINE]
+
 # ---------------------------------------------------------------- data generation (SEREEGA)
-LEADFIELD = REPO / "anatomy" / "leadfield_185_20k.mat"          # 185 x 994, average-referenced (keys: G, fwd, fwd_raw)
-ELECTRODES = REPO / "anatomy" / "electrode_185.mat"
+LEADFIELD = REPO / "anatomy" / _P["leadfield"]          # n x 994, average-referenced (keys: G, fwd, fwd_raw)
+ELECTRODES = REPO / "anatomy" / _P["electrodes"]
+ELOC_KEY = _P["eloc_key"]
+NOISE_MODEL = REPO / "anatomy" / _P["noise"]
 SOURCES_994 = REPO / "anatomy" / "sources_fsav_994.mat"
-N_ELECTRODES = 185
+N_ELECTRODES = _P["n"]
+REFERENCE_FILES = [_P["leadfield"], _P["electrodes"], "sources_fsav_994.mat", "fs_cortex_20k_region_mapping.mat", _P["noise"]]
 N_SOURCES = 994
 
 # The folder level called "montage" must be `standard_1020`: main_train.py hard-codes that name when it builds the

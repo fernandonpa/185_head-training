@@ -60,7 +60,7 @@ def simu_dir(root: Path, name: str) -> Path:
 
 def write_model_folder(root: Path) -> Path:
     """185-electrode info in the file format HeadModel.ElectrodeSpace reads (otherwise it silently falls back to the 75-electrode file)."""
-    e = loadmat(str(C.ELECTRODES), simplify_cells=True)["eloc185"]
+    e = loadmat(str(C.ELECTRODES), simplify_cells=True)[C.ELOC_KEY]
     names = np.array([str(x["labels"]) for x in e], dtype=object)
     pos = np.array([[x["X"], x["Y"], x["Z"]] for x in e], float)
     d = root / "simulation" / C.SUBJECT / C.ORIENTATION / C.MONTAGE_DIR / C.SOURCE_SPACE / "model"

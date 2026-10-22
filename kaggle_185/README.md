@@ -54,3 +54,7 @@ The generated data (≈ 11 GB) go to `/kaggle/temp`, which is not saved with the
   `SETTINGS = "team_deepsif"` (default of the DeepSIF notebook) reproduces the DeepSIF notebook; `SETTINGS = "match_vit185"` trains DeepSIF with exactly the settings of the ViT-185 notebook (strictly identical setup).
   Everything else is identical for both models: 100 epochs, Adam lr 1e-3, cosine loss, 4800/1200 split, `-eeg_snr 5`, `-scaler linear`.
 * DeepSIF with 185 electrodes has 22 528 396 trainable parameters (thesis: 22.38 M with 75 electrodes). Its zip omits `last.ckpt` (270 MB, only needed to resume) so that it stays around 250 MB.
+
+## 75-electrode profile
+The same scripts also run the 75-electrode pipeline (the 75 of the 185 electrodes that best match the original montage): set the environment variable `ESI_PIPELINE=75sub` (the notebooks in `kaggle_75sub/` do it in their first cell).
+Default (`185`) behaviour is unchanged. See `kaggle_75sub/README.md` and `headmodel_75sub/README.md`.

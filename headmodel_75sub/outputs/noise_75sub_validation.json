@@ -1,0 +1,7 @@
+{
+  "corr_cosine_generated_vs_target": 0.999659594415325,
+  "n90_target": 18,
+  "n90_generated": 18,
+  "generated_avg_ref_residual": 3.552713678800501e-16,
+  "target_rank": 74
+}

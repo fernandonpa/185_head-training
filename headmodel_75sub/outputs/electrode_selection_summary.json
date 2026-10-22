@@ -1,0 +1,66 @@
+{
+  "method": "hungarian_sq",
+  "rule": "highest median region topography correlation with the original montage's forward model",
+  "n_selected": 75,
+  "unique": 75,
+  "distance_mm": {
+    "median": 8.656614984587382,
+    "p90": 21.079138129204154,
+    "max": 31.8571299651415
+  },
+  "fidelity": {
+    "hungarian_sum": {
+      "corr_median": 0.9895723634925357,
+      "corr_p05": 0.9749718122373999,
+      "corr_min": 0.9166911868520944,
+      "rel_err_median": 0.146893496267455,
+      "rel_err_p95": 0.23119525538278923,
+      "rel_err_global": 0.1558074625155328
+    },
+    "hungarian_sq": {
+      "corr_median": 0.9900379517758536,
+      "corr_p05": 0.9772917810380611,
+      "corr_min": 0.9316822066630824,
+      "rel_err_median": 0.1449687337993606,
+      "rel_err_p95": 0.22940593997621214,
+      "rel_err_global": 0.15025425768777906
+    },
+    "greedy": {
+      "corr_median": 0.9890808425343908,
+      "corr_p05": 0.9738379946179883,
+      "corr_min": 0.9244080263281769,
+      "rel_err_median": 0.15095132763916835,
+      "rel_err_p95": 0.23676624395722556,
+      "rel_err_global": 0.15779349631618922
+    },
+    "bottleneck": {
+      "corr_median": 0.9900379517758536,
+      "corr_p05": 0.9772917810380611,
+      "corr_min": 0.9316822066630824,
+      "rel_err_median": 0.1449687337993606,
+      "rel_err_p95": 0.22940593997621214,
+      "rel_err_global": 0.15025425768777906
+    },
+    "random assignment (mean of 100)": {
+      "corr_median": -0.009834109895171446,
+      "corr_p05": null,
+      "corr_min": null,
+      "rel_err_median": null,
+      "rel_err_p95": null,
+      "rel_err_global": null
+    }
+  },
+  "target_fit": {
+    "n_shared": 72,
+    "fit_scale": 1.048512100892823,
+    "fit_residual_median_mm": 4.278584071303085,
+    "fit_residual_max_mm": 18.951860878983883,
+    "nz_transform_vs_nasion_mm": 7.013146021360652,
+    "missing": [
+      "Nz",
+      "TP11",
+      "TP12"
+    ]
+  },
+  "order": "same order as anatomy/electrode_75.mat"
+}
