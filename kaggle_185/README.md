@@ -5,7 +5,8 @@ Open `ViTESI_185_pipeline_kaggle.ipynb` on Kaggle (Accelerator **GPU T4 x2**, In
 
 | File | Role |
 |------|------|
-| `ViTESI_185_pipeline_kaggle.ipynb` | the notebook: clone → generate → train → test → analyse → zip (one setting cell at the top, `QUICK_TEST=True` = ~10-minute dry run) |
+| `ViTESI_185_pipeline_kaggle.ipynb` | the ViT-ESI notebook: clone → generate → train → test → analyse → zip (one setting cell at the top, `QUICK_TEST=True` = ~10-minute dry run) |
+| `DeepSIF_185_pipeline_kaggle.ipynb` | the same pipeline for the **DeepSIF** baseline, on the **same** generated data (see below) |
 | `config_185.py` | all data-generation / training settings in one place |
 | `generate_data_185.py` | runs `data_generation/sereega/simu_extended_source.py` for train and test (in parallel, different seeds), verifies the files, writes `data_manifest.json` and the 185-electrode `model/ch_fsav_994.mat` |
 | `train_185.py` | runs the team's `main_train.py` unchanged and adds `callbacks_185.py` (recording, one model file overwritten per epoch) |
@@ -42,3 +43,14 @@ The generated data (≈ 11 GB) go to `/kaggle/temp`, which is not saved with the
 * The team's `eval.py` uses the localisation error of the *seed* regions of each patch (see the code) and white noise at `-eeg_snr`; the validation proxies logged during training are cheaper and only for monitoring.
 * Resume after an interruption in the same session: set `RESUME = True` in the setting cell.
 * Tested locally on CPU (data generation → training incl. a 2-process DDP run → test → analysis → zip) with `QUICK_TEST`; the 2-GPU NCCL run itself can only be confirmed on Kaggle.
+
+## Comparing ViT-ESI and DeepSIF (same data, same test)
+
+* Both notebooks generate the data with the same code, leadfield, sizes and seeds (train 6000 / seed 0, test 2000 / seed 1). The generation is deterministic: `logs/data_manifest.json` contains a **fingerprint** of every split
+  (`md_sha256`: all metadata files; `eeg_sha256`: 20 EEG samples) and two independent runs gave identical fingerprints (checked locally). In the DeepSIF notebook you can paste the ViT run's `md_sha256` values into
+  `EXPECTED_FINGERPRINT` to make the notebook stop if the data differ.
+* The test is the same `eval.py` on the same `test_2000`, evaluated at the same SNR (5 dB), so `test_per_sample_metrics.csv` of the two runs can be joined on `sample_id`.
+* **Training settings.** The previous team's DeepSIF notebook uses a global batch of 8 and 32-bit precision, while their ViT-ESI notebook (and `ViTESI_185_pipeline_kaggle.ipynb`) uses a global batch of 64 and 16-bit mixed precision.
+  `SETTINGS = "team_deepsif"` (default of the DeepSIF notebook) reproduces the DeepSIF notebook; `SETTINGS = "match_vit185"` trains DeepSIF with exactly the settings of the ViT-185 notebook (strictly identical setup).
+  Everything else is identical for both models: 100 epochs, Adam lr 1e-3, cosine loss, 4800/1200 split, `-eeg_snr 5`, `-scaler linear`.
+* DeepSIF with 185 electrodes has 22 528 396 trainable parameters (thesis: 22.38 M with 75 electrodes). Its zip omits `last.ckpt` (270 MB, only needed to resume) so that it stays around 250 MB.

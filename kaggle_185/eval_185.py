@@ -61,7 +61,7 @@ def export(g: dict, out: Path, n_pred: int = 12) -> None:
             df[f"{m}_{col}"] = v * scale
     df.to_csv(out / "test_per_sample_metrics.csv", index=False)
 
-    summary = dict(n_samples=len(df), methods=methods, noise_snr_db=g["args"].eeg_snr, simu_name=g["args"].simu_name, weights=str(g.get("vit_model_path", "")))
+    summary = dict(n_samples=len(df), methods=methods, noise_snr_db=g["args"].eeg_snr, simu_name=g["args"].simu_name, weights=str(g.get("vit_model_path", "") or g.get("deep_sif_model_path", "")))
     for m in methods:
         cols = [f"{m}_{c}" for c, _ in METRIC_NAMES.values()]
         desc = df[cols].describe(percentiles=[0.25, 0.5, 0.75]).T
@@ -73,10 +73,12 @@ def export(g: dict, out: Path, n_pred: int = 12) -> None:
     if eval_dir.is_dir():
         shutil.copytree(eval_dir, out / "eval_original", dirs_exist_ok=True)
 
-    if "eeg_vit" in methods and "eeg_vit" in g:
+    nn_methods = {"eeg_vit": ("eeg_vit", "vit_device"), "deep_sif": ("deep_sif", "sif_device")}      # method -> (model variable, device variable) in eval.py
+    m_nn = next((m for m in methods if m in nn_methods and nn_methods[m][0] in g), None)
+    if m_nn is not None:
         rng = np.random.default_rng(0)
         pick = sorted(rng.choice(len(idxs), size=min(n_pred, len(idxs)), replace=False).tolist())
-        model, dev, utl, fwd = g["eeg_vit"], g["vit_device"], g["utl"], torch.from_numpy(g["fwd"])
+        model, dev, utl, fwd = g[nn_methods[m_nn][0]], g[nn_methods[m_nn][1]], g["utl"], torch.from_numpy(g["fwd"])
         eeg_l, gt_l, pr_l, ids_l = [], [], [], []
         for p in pick:
             k = idxs[p]
@@ -87,7 +89,7 @@ def export(g: dict, out: Path, n_pred: int = 12) -> None:
                 j_hat = model(M.unsqueeze(0).to(dev)).squeeze().float().cpu()
             j_hat = utl.gfp_scaling(M_un, j_hat, fwd)
             eeg_l.append(M.numpy().astype("float16")); gt_l.append(j_un.numpy().astype("float16")); pr_l.append(j_hat.numpy().astype("float16")); ids_l.append(int(df.sample_id[p]))
-        np.savez_compressed(out / "test_predictions_sample.npz", eeg=np.stack(eeg_l), gt=np.stack(gt_l), pred=np.stack(pr_l), sample_id=np.array(ids_l), position=np.array(pick))
+        np.savez_compressed(out / "test_predictions_sample.npz", method=m_nn, eeg=np.stack(eeg_l), gt=np.stack(gt_l), pred=np.stack(pr_l), sample_id=np.array(ids_l), position=np.array(pick))
 
 
 if __name__ == "__main__":

@@ -58,7 +58,8 @@ def test_figures(te: Path, fig: Path, md: list):
     if not f.exists():
         return
     df = pd.read_csv(f)
-    m = "eeg_vit"
+    summ = json.loads((te / "test_summary.json").read_text()) if (te / "test_summary.json").exists() else {}
+    m = next((x for x in summ.get("methods", []) if x != "gt"), "eeg_vit")
     cols = [("loc_error_mm", "localisation error (mm)"), ("auc", "AUC"), ("nmse", "nMSE"), ("psnr_db", "PSNR (dB)"), ("time_error_ms", "time error (ms)")]
     fig_, ax = plt.subplots(2, 5, figsize=(20, 7))
     for i, (c, t) in enumerate(cols):
@@ -67,8 +68,8 @@ def test_figures(te: Path, fig: Path, md: list):
         data = [df.loc[df.n_patch == p, f"{m}_{c}"].dropna() for p in sorted(df.n_patch.unique())]
         ax[1, i].boxplot(data, tick_labels=[str(p) for p in sorted(df.n_patch.unique())]); ax[1, i].set_xlabel("number of patches"); ax[1, i].set_title(f"{t} by number of patches")
     fig_.tight_layout(); fig_.savefig(fig / "fig_test_metrics.png"); plt.close(fig_)
-    s = json.loads((te / "test_summary.json").read_text()) if (te / "test_summary.json").exists() else {}
-    md += ["## Test set (simulated, SEREEGA)", "", f"* {len(df)} samples, evaluation SNR {s.get('noise_snr_db', '?')} dB (white noise)", "",
+    s = summ
+    md += ["## Test set (simulated, SEREEGA)", "", f"* method: {m}; {len(df)} samples, evaluation SNR {s.get('noise_snr_db', '?')} dB (white noise)", "",
            "| metric | mean | std | median | 25 % | 75 % |", "|---|---|---|---|---|---|"]
     for c, t in cols:
         d = s.get(m, {}).get(f"{m}_{c}")
@@ -108,11 +109,12 @@ def prediction_figure(te: Path, fig: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", required=True)
+    ap.add_argument("--label", default="ViT-ESI", help="model name used in the title")
     a = ap.parse_args()
     root = Path(a.results)
     fig = root / "figures"
     fig.mkdir(exist_ok=True)
-    md = ["# Results summary (185-electrode ViT-ESI, SEREEGA)", ""]
+    md = [f"# Results summary (185-electrode {a.label}, SEREEGA)", ""]
     for name in ("run_manifest.json",):
         f = root / name
         if f.exists():

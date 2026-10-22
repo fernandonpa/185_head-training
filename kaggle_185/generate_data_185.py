@@ -69,6 +69,20 @@ def write_model_folder(root: Path) -> Path:
     return d
 
 
+def fingerprint(d: Path, n: int) -> dict:
+    """Identifies the generated data: two runs with the same code, leadfield, seed and size must give the same fingerprint (so that two
+    notebooks, e.g. ViT-ESI and DeepSIF, can be shown to use the same dataset).  md_sha256: exact text of all metadata files (seeds,
+    orders, patches); eeg_sha256: 20 EEG samples rounded to 5 decimals after scaling (robust against last-digit floating-point differences)."""
+    h = hashlib.sha256()
+    for i in range(1, n + 1):
+        h.update((d / "md" / f"{i}_md_json_flie.json").read_bytes())
+    he = hashlib.sha256()
+    for i in np.unique(np.linspace(1, n, 20).astype(int)):
+        x = loadmat(d / "eeg" / "infdb" / f"{i}_eeg.mat", simplify_cells=True)["eeg_data"]["EEG"]
+        he.update(np.round(x / np.abs(x).max(), 5).tobytes())
+    return dict(md_sha256=h.hexdigest(), eeg_sha256=he.hexdigest())
+
+
 def verify_split(root: Path, name: str, n: int, seed: int) -> dict:
     d = simu_dir(root, name)
     cfg = json.load(open(d / f"{name}{C.SOURCE_SPACE}_config.json"))
@@ -107,7 +121,7 @@ def verify_split(root: Path, name: str, n: int, seed: int) -> dict:
     return dict(name=name, n=n, seed=seed, path=str(d), config=cfg, n_eeg_files=n_eeg, problems=problems,
                 eeg_max_abs_checked_samples=dict(min=min(amp, default=None), median=float(np.median(amp)) if amp else None, max=max(amp, default=None)),
                 eeg_avg_reference_residual_rel_max=max(col_mean_rel, default=None), n_active_regions_checked=dict(min=min(n_active, default=None), max=max(n_active, default=None)),
-                n_patch_hist=hist(n_patch), order_hist=hist(orders),
+                fingerprint=fingerprint(d, n), n_patch_hist=hist(n_patch), order_hist=hist(orders),
                 patch_size=dict(min=int(min(patch_sizes)), median=float(np.median(patch_sizes)), max=int(max(patch_sizes))))
 
 
