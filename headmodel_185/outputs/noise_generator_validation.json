@@ -1,0 +1,10 @@
+{
+  "corr_distance_max_abs_diff": 0.004776726532037423,
+  "corr_matrix_cosine": 0.9996721641182841,
+  "psd_slope_real": -1.754460034351275,
+  "psd_slope_generated": -1.6417204728597317,
+  "n90_real": 21,
+  "n90_generated": 22,
+  "generated_avg_ref_residual": 9.217851707158057e-16,
+  "generated_time_mean_max": 5.964118088286341e-16
+}

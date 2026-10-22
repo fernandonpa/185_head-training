@@ -1,0 +1,22 @@
+{
+  "created": "2026-10-22 13:49:00",
+  "seconds": 124.5,
+  "mne": "1.12.1",
+  "montage": "GSN-HydroCel-256",
+  "n_electrodes": 185,
+  "source_space": "fsaverage ico5 pial",
+  "n_vertices": 20484,
+  "n_regions": 994,
+  "bem_ico": 4,
+  "conductivity": [
+    0.33,
+    0.004125,
+    0.33
+  ],
+  "leadfield_shape": [
+    185,
+    994
+  ],
+  "abs_median_raw": 343.98434376716614,
+  "abs_max_raw": 6990.4610595703125
+}

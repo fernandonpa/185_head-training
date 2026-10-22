@@ -1,0 +1,31 @@
+{
+  "n_shared": 72,
+  "missing": [
+    "Nz",
+    "TP11",
+    "TP12"
+  ],
+  "seconds": 148.4,
+  "sum": {
+    "topo_corr_median": 0.9176350244077838,
+    "topo_corr_p05": 0.764643508079331,
+    "topo_corr_min": -0.9580684351138505,
+    "scale_k_overall": 0.1600735618077444,
+    "rel_residual_after_scale": 0.5128169713606309
+  },
+  "mean": {
+    "topo_corr_median": 0.9176350244077836,
+    "topo_corr_p05": 0.7646435080793302,
+    "topo_corr_min": -0.9580684351138503,
+    "scale_k_overall": 3.016737100938739,
+    "rel_residual_after_scale": 0.6805980491651837
+  },
+  "column_scale_k": {
+    "median": 0.16654983970540596,
+    "p05": 0.1248126713483464,
+    "p95": 0.23109097278238908,
+    "cv": 0.3532593604329039
+  },
+  "team_mean_over_electrodes_rel": 0.15215201785334478,
+  "mine_mean_over_electrodes_rel": 0.17063790565813095
+}

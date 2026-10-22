@@ -1,0 +1,44 @@
+{
+  "shape": [
+    185,
+    994
+  ],
+  "order_equals_electrodes_185_csv": true,
+  "electrode_mat_order_equals_csv": true,
+  "G_equals_fwd": true,
+  "avg_ref_max_column_mean": 5.506130086409079e-13,
+  "raw_mean_over_electrodes_rel": 0.18678733445800438,
+  "finite": true,
+  "zero_columns": 0,
+  "electrode_to_scalp_mm": {
+    "median": 7.390353862096047,
+    "p95": 15.34110013402255,
+    "max": 16.718503091993806,
+    "signed_median": -6.740043283838901,
+    "n_outside": 27
+  },
+  "electrode_cloud_scaling_sensitivity": {
+    "0.9": {
+      "topo_corr_median": 0.9993161409452944,
+      "topo_corr_min": 0.9919040976399776,
+      "rel_diff": 0.04139346903318074
+    },
+    "1.1": {
+      "topo_corr_median": 0.9995163344028641,
+      "topo_corr_min": 0.9947756331957377,
+      "rel_diff": 0.03523434014496327
+    }
+  },
+  "strongest_electrode_vs_overlying_electrode_mm": {
+    "median": 27.84640492870291,
+    "p75": 43.880362784193615,
+    "p95": 75.79486530672929
+  },
+  "pole_ratio_median": 1.8727414722734586,
+  "singular_values": {
+    "rank_numeric": 184,
+    "s1": 206929.7405803796,
+    "s_ratio_184_over_1": 0.00012982114983357663,
+    "condition_first_184": 7702.9051220232095
+  }
+}

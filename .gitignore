@@ -1,0 +1,27 @@
+# environement folder
+.env/
+venv/
+.venv/
+
+#simulation folder
+
+simulation/
+
+__pycache__/
+*.pyc 
+*.npy
+
+
+model_training/results/
+model_training/trained_models/
+
+
+model_training/training_times.txt   
+
+# folders kept local (not pushed to the personal repo used for Kaggle)
+experiments/
+notebook/
+notebooks/
+document/
+validation_preprocessing/
+kaggle/
