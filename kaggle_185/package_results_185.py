@@ -93,7 +93,7 @@ def main():
         if (REPO / "anatomy" / name).exists():
             shutil.copy2(REPO / "anatomy" / name, res / "reference" / name)
     fmt = dict(cfg, n=C.N_ELECTRODES, lf_name=C.LEADFIELD.name, el_name=C.ELECTRODES.name,
-               channel_note="= electrodes_185.csv of the validation dataset" if C.PIPELINE == "185" else "= the 75 electrodes selected from the 185, in the order of the original 75-electrode montage; see ccepcoreg_75sub/electrodes_75sub.csv")
+               channel_note={"185": "= electrodes_185.csv of the validation dataset", "256": "= the 256 channels E1..E256 of the coreg-spikes net (validation_ready/coregspikes/electrodes_256.csv)"}.get(C.PIPELINE, "= the 75 electrodes selected from the 185, in the order of the original 75-electrode montage; see ccepcoreg_75sub/electrodes_75sub.csv"))
     fmt["model_ctor"] = cfg["model_ctor"].format(n=C.N_ELECTRODES)
     (res / "README_RESULTS.md").write_text(README.format(**fmt))
 

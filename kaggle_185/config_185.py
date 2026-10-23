@@ -12,11 +12,12 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 
 # Pipeline profile: "185" (default) = the 185 released ccepcoreg electrodes; "75sub" = the 75 of them selected to match the original 75-electrode montage
-# (headmodel_75sub/).  Everything else (data generation, training, test) is identical; only the electrode set / leadfield differ.
+# (headmodel_75sub/); "256" = the 256 channels of the coreg-spikes net (headmodel_256/).  Everything else (data generation, training, test) is identical; only the electrode set / leadfield differ.
 PIPELINE = os.environ.get("ESI_PIPELINE", "185")
 _PROFILES = {
     "185": dict(leadfield="leadfield_185_20k.mat", electrodes="electrode_185.mat", eloc_key="eloc185", n=185, noise="noise_model_185.mat"),
     "75sub": dict(leadfield="leadfield_75sub_20k.mat", electrodes="electrode_75sub.mat", eloc_key="eloc75sub", n=75, noise="noise_model_75sub.mat"),
+    "256": dict(leadfield="leadfield_256_20k.mat", electrodes="electrode_256.mat", eloc_key="eloc256", n=256, noise="noise_model_256.mat"),   # coreg-spikes net, all 256 channels (headmodel_256/)
 }
 if PIPELINE not in _PROFILES:
     raise ValueError(f"ESI_PIPELINE must be one of {sorted(_PROFILES)}, got {PIPELINE!r}")
