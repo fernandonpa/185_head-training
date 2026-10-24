@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -43,7 +44,7 @@ def git_commit() -> str:
 def generation_cmd(name: str, n: int, seed: int, root: Path) -> list[str]:
     s = C.SEREEGA
     return [
-        sys.executable, str(C.REPO / "data_generation" / "sereega" / "simu_extended_source.py"),
+        sys.executable, os.environ.get("ESI_GENERATOR") or str(C.REPO / "data_generation" / "sereega" / "simu_extended_source.py"),   # ESI_GENERATOR: optional patched copy (kaggle_256_regions/)
         "-sin", name, "-ne", str(n), "--seed", str(seed),
         "-mk", C.MONTAGE_DIR, "-ss", C.SOURCE_SPACE, "-o", C.ORIENTATION, "-sn", C.SUBJECT,
         "-rf", str(root), "-af", str(C.REPO / "anatomy"), "--leadfield_mat", str(C.LEADFIELD),
